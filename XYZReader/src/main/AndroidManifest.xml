@@ -48,7 +48,6 @@
             android:authorities="com.example.xyzreader"
             android:exported="false" />
 
-
     </application>
 
 </manifest>
