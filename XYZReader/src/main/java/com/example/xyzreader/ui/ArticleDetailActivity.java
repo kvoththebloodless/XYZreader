@@ -12,9 +12,7 @@ import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
-import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
@@ -28,36 +26,20 @@ public class ArticleDetailActivity extends AppCompatActivity
 
     private Cursor mCursor;
     private long mStartId;
-
-    private long mSelectedItemId;
-    private int mSelectedItemUpButtonFloor = Integer.MAX_VALUE;
-    private int mTopInset;
-
     private ViewPager mPager;
     private MyPagerAdapter mPagerAdapter;
-    private View mUpButtonContainer;
-    private View mUpButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            postponeEnterTransition();
-        }
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_article_detail);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            postponeEnterTransition();
 
+        }
         mPager = (ViewPager) findViewById(R.id.pager);
-
-        mPager.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            public boolean onPreDraw() {
-               mPager.getViewTreeObserver().removeOnPreDrawListener(this);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    startPostponedEnterTransition();
-                }
-                return true;
-            }
-        });
         mPagerAdapter = new MyPagerAdapter(getFragmentManager());
         getLoaderManager().initLoader(0, null, this);
         mPager.setAdapter(mPagerAdapter);
@@ -65,11 +47,9 @@ public class ArticleDetailActivity extends AppCompatActivity
                 .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()));
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
-
         if (savedInstanceState == null) {
             if (getIntent() != null && getIntent().getData() != null) {
                 mStartId = ItemsContract.Items.getItemId(getIntent().getData());
-                mSelectedItemId = mStartId;
             }
         }
     }
@@ -121,7 +101,8 @@ public class ArticleDetailActivity extends AppCompatActivity
         @Override
         public Fragment getItem(int position) {
             mCursor.moveToPosition(position);
-            return ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID));
+
+            return ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID), position);
         }
 
         @Override

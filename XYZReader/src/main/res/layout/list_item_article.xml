@@ -2,10 +2,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="200dp"
     android:layout_height="wrap_content"
-
     android:clickable="true"
     android:focusable="true"
     android:foreground="?selectableItemBackground"
+    android:stateListAnimator="@anim/card_elevation"
     app:cardElevation="@dimen/xyz_resting_card_elevation"
     app:cardUseCompatPadding="true">
 
@@ -19,7 +19,8 @@
             android:id="@+id/thumbnail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/divider" />
+            android:background="@color/divider"
+            android:transitionName="@string/shared_image" />
 
         <com.example.xyzreader.ui.DynamicImageGradient
             android:id="@+id/shadow"
@@ -39,11 +40,8 @@
             android:maxLines="3"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
-            android:textColor="#F2FFFFFF"
-            android:textSize="20sp"
-
-
-            android:textStyle="bold" />
+            android:textAppearance="@style/Title"
+            android:textColor="@color/list_title" />
 
         <TextView
             android:id="@+id/article_subtitle"
@@ -55,10 +53,7 @@
             android:fontFamily="sans-serif-thin"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
-
             android:textColor="#F2FFFFFF"
-
-
             android:textSize="14sp" />
     </RelativeLayout>
 

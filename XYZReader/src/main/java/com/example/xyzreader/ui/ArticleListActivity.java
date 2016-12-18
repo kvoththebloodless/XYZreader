@@ -9,18 +9,15 @@ import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
-import android.transition.Explode;
-import android.transition.Transition;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.TextView;
 
 import com.example.xyzreader.R;
@@ -42,6 +39,7 @@ public class ArticleListActivity extends AppCompatActivity implements
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private boolean mIsRefreshing = false;
+
     private BroadcastReceiver mRefreshingReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -64,7 +62,6 @@ public class ArticleListActivity extends AppCompatActivity implements
         getSupportActionBar().setIcon(R.mipmap.ic_launcher);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         getLoaderManager().initLoader(0, null, this);
 
@@ -120,8 +117,7 @@ public class ArticleListActivity extends AppCompatActivity implements
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public DynamicHeightNetworkImageView thumbnailView;
-        public TextView titleView;
-        public TextView subtitleView;
+        public TextView titleView, subtitleView;
         public DynamicImageGradient shadow;
 
         public ViewHolder(View view) {
@@ -151,20 +147,42 @@ public class ArticleListActivity extends AppCompatActivity implements
 
             View view = getLayoutInflater().inflate(R.layout.list_item_article, parent, false);
             final ViewHolder vh = new ViewHolder(view);
-          //  getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-
 
             view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Bundle bundle= null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                        bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(ArticleListActivity.this).toBundle();
-                    }
-                    startActivity(new Intent(Intent.ACTION_VIEW,
-                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))),bundle);
-                }
-            });
+
+
+                                        @Override
+                                        public void onClick(View view) {
+
+
+                                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+
+                                                View decor = getWindow().getDecorView();
+//                        View statusBar = decor.findViewById(android.R.id.statusBarBackground);
+//                        statusBar.setTransitionName(getResources().getResourceName(R.string.shared_statusbar));
+                                                View navBar = decor.findViewById(android.R.id.navigationBarBackground);
+                                                navBar.setTransitionName(getResources().getResourceName(R.string.shared_softkeys));
+//                        View actionBar = findViewById(getResources().getIdentifier(
+//                                "action_bar_container", "id", "android"));
+//                        actionBar.setTransitionName(getResources().getResourceName(R.string.shared_actionbar));
+                                                view.setTransitionName(getResources().getResourceName(R.string.shared_image) + vh.getLayoutPosition());
+                                                Pair<View, String> p1 = Pair.create(view, view.getTransitionName());
+                                                // Pair<View, String> p2 = Pair.create(statusBar,statusBar.getTransitionName() );
+                                                Pair<View, String> p3 = Pair.create(navBar, navBar.getTransitionName());
+                                                //  Pair<View, String> p4 = Pair.create(actionBar, actionBar.getTransitionName());
+                                                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this, p1, p3);
+                                                startActivity(new Intent(Intent.ACTION_VIEW,
+                                                        ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))), options.toBundle());
+                                            } else
+                                                startActivity(new Intent(Intent.ACTION_VIEW,
+                                                        ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
+
+
+                                        }
+
+                                    }
+
+            );
             vh.setIsRecyclable(false);
             return vh;
         }
@@ -182,7 +200,8 @@ public class ArticleListActivity extends AppCompatActivity implements
                             + mCursor.getString(ArticleLoader.Query.AUTHOR));
             holder.shadow.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
             holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
-            Picasso.with(ArticleListActivity.this).load(mCursor.getString(ArticleLoader.Query.THUMB_URL)).into(holder.thumbnailView);
+            Picasso.with(ArticleListActivity.this).load(mCursor.getString(ArticleLoader.Query.PHOTO_URL)).fetch();//prefetching of full bleed photos for smoother shared element transition
+            Picasso.with(ArticleListActivity.this).load(mCursor.getString(ArticleLoader.Query.THUMB_URL)).placeholder(R.drawable.empty_detail).into(holder.thumbnailView);
         }
 
         @Override

@@ -13,7 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-
+<set>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_enabled="true" android:state_pressed="true">
         <set>
@@ -25,8 +25,10 @@
     <item>
         <set>
             <objectAnimator android:duration="@android:integer/config_shortAnimTime"
-                android:propertyName="translationZ" android:valueTo="0"
+                android:propertyName="translationZ" android:valueTo="@dimen/xyz_resting_fab_elevation"
                 android:valueType="floatType" />
         </set>
     </item>
 </selector>
+
+</set>
